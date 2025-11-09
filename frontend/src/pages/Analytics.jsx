@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { userService } from '../services/userService';
-import ProgressChart from '../components/analytics/ProgressChart';
-import XPChart from '../components/analytics/XPChart';
-import ActivityHeatmap from '../components/analytics/ActivityHeatmap';
-import Card from '../components/common/Card';
-import { FaChartLine } from 'react-icons/fa';
+import { mockUser, getLevelFromXP, getProgressPercentage } from '../data/mockUser';
+import './Analytics.css';
 
-const Analytics = () => {
-  const [analytics, setAnalytics] = useState(null);
+export default function Analytics() {
+  const [user] = useState(mockUser);
+  const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,60 +13,136 @@ const Analytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const data = await userService.getAnalytics();
-      setAnalytics(data);
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-    } finally {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setAnalyticsData({
+          total_quests: user.quests_completed,
+          total_xp: user.total_xp,
+          level: user.level,
+          current_streak: user.current_streak,
+          longest_streak: user.longest_streak,
+          badges_earned: user.badges.length,
+          member_since: user.member_since,
+          progress: {
+            progress_percentage: getProgressPercentage(user.total_xp)
+          }
+        });
+        setLoading(false);
+      }, 500);
+    } catch (err) {
+      console.error('Error:', err);
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    );
+  if (loading || !analyticsData) {
+    return <div className="loading">⏳ Loading analytics...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-8 rounded-lg flex items-center gap-4">
-        <FaChartLine className="text-5xl" />
-        <div>
-          <h1 className="text-4xl font-bold">Your Analytics</h1>
-          <p className="text-primary-100">Track your learning progress and growth</p>
+    <div className="analytics-container">
+      <div className="analytics-header">
+        <h1>📊 Your Analytics</h1>
+        <p>Track your progress and achievements</p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="summary-grid">
+        <div className="summary-card">
+          <h3>Total XP Earned</h3>
+          <p className="big-number">{analyticsData.total_xp.toLocaleString()}</p>
+        </div>
+
+        <div className="summary-card">
+          <h3>Current Level</h3>
+          <p className="big-number">{analyticsData.level}</p>
+        </div>
+
+        <div className="summary-card">
+          <h3>Quests Completed</h3>
+          <p className="big-number">{analyticsData.total_quests}</p>
+        </div>
+
+        <div className="summary-card">
+          <h3>Active Streak</h3>
+          <p className="big-number">{analyticsData.current_streak} 🔥</p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <ProgressChart data={analytics?.progress || []} />
-        <XPChart data={analytics?.xp_growth || []} />
+      {/* Level Progress */}
+      <div className="analytics-section">
+        <h2>📈 Level Progress</h2>
+        <div className="progress-card">
+          <div className="progress-info">
+            <span>Level {analyticsData.level}</span>
+            <span>{analyticsData.progress.progress_percentage}%</span>
+          </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{width: analyticsData.progress.progress_percentage + '%'}}
+            ></div>
+          </div>
+          <p className="progress-text">
+            Progress towards Level {analyticsData.level + 1}
+          </p>
+        </div>
       </div>
 
-      <ActivityHeatmap data={analytics?.activity || {}} />
+      {/* Streaks */}
+      <div className="analytics-section">
+        <h2>🔥 Streaks</h2>
+        <div className="streaks-grid">
+          <div className="streak-box">
+            <h3>Current Streak</h3>
+            <p className="streak-number">{analyticsData.current_streak}</p>
+            <p className="streak-label">days</p>
+          </div>
+          <div className="streak-box">
+            <h3>Best Streak</h3>
+            <p className="streak-number">{analyticsData.longest_streak}</p>
+            <p className="streak-label">days</p>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="text-center">
-          <p className="text-3xl font-bold text-primary-600">{analytics?.total_quests || 0}</p>
-          <p className="text-gray-600 mt-2">Quests Completed</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-3xl font-bold text-success">{analytics?.total_tasks || 0}</p>
-          <p className="text-gray-600 mt-2">Tasks Completed</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-3xl font-bold text-warning">{analytics?.avg_time || '0m'}</p>
-          <p className="text-gray-600 mt-2">Avg. Time/Quest</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-3xl font-bold text-danger">{analytics?.streak_days || 0}</p>
-          <p className="text-gray-600 mt-2">Days Streak</p>
-        </Card>
+      {/* Achievements */}
+      <div className="analytics-section">
+        <h2>🎖️ Achievements</h2>
+        <div className="achievements-grid">
+          <div className="achievement-item">
+            <span className="achievement-icon">✅</span>
+            <h4>Quests Completed</h4>
+            <p>{analyticsData.total_quests}</p>
+          </div>
+          <div className="achievement-item">
+            <span className="achievement-icon">⚡</span>
+            <h4>Total XP</h4>
+            <p>{analyticsData.total_xp.toLocaleString()}</p>
+          </div>
+          <div className="achievement-item">
+            <span className="achievement-icon">🎖️</span>
+            <h4>Badges Earned</h4>
+            <p>{analyticsData.badges_earned}</p>
+          </div>
+          <div className="achievement-item">
+            <span className="achievement-icon">👑</span>
+            <h4>Current Level</h4>
+            <p>{analyticsData.level}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Membership */}
+      <div className="analytics-section">
+        <h2>📅 Membership</h2>
+        <div className="membership-info">
+          <p>Member for <strong>{analyticsData.member_since} months</strong></p>
+          <p>Username: <strong>{user.username}</strong></p>
+          <p>Email: <strong>{user.email}</strong></p>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Analytics;
+}

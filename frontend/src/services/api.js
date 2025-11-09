@@ -1,6 +1,9 @@
 import axios from 'axios';
 
+// Get API URL from environment or use default
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,48 +12,80 @@ const api = axios.create({
   },
 });
 
-// Add token to requests if it exists
+// Interceptor to add token to all requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('🔐 Token added to request');
   }
   return config;
 });
 
+// Interceptor to handle responses
+api.interceptors.response.use(
+  (response) => {
+    console.log('✅ Response received:', response.status);
+    return response;
+  },
+  (error) => {
+    console.error('❌ API Error:', error.response?.status, error.message);
+    return Promise.reject(error);
+  }
+);
+
 export const apiService = {
-  // Auth
-  register: (userData) => api.post('/auth/register', userData),
-  login: (credentials) => api.post('/auth/login', credentials),
+  // Health
+  health: () => {
+    console.log('🏥 Checking health...');
+    return api.get('/health');
+  },
+
+  // Auth endpoints
+  register: (userData) => {
+    console.log('📝 Registering user:', userData.username);
+    return api.post('/auth/register', userData);
+  },
   
+  login: (credentials) => {
+    console.log('🔓 Logging in...');
+    return api.post('/auth/login', credentials);
+  },
+
   // Quests
-  getQuests: (limit = 50, skip = 0) => api.get(`/quests?limit=${limit}&skip=${skip}`),
-  getQuestById: (questId) => api.get(`/quests/${questId}`),
-  startQuest: (questId, userId) => api.post(`/quests/${questId}/start`, { user_id: userId }),
+  getQuests: (limit = 50, skip = 0) => {
+    console.log('📚 Fetching quests...');
+    return api.get(`/quests?limit=${limit}&skip=${skip}`);
+  },
   
+  getQuestById: (questId) => {
+    console.log('📖 Fetching quest:', questId);
+    return api.get(`/quests/${questId}`);
+  },
+
   // Leaderboard
-  getLeaderboard: (type = 'all_time', limit = 100) => 
-    api.get(`/leaderboard?type=${type}&limit=${limit}`),
-  getUserRank: (userId, type = 'all_time') => 
-    api.get(`/leaderboard/user/${userId}?type=${type}`),
-  
+  getLeaderboard: (type = 'all_time', limit = 100) => {
+    console.log('🏆 Fetching leaderboard...');
+    return api.get(`/leaderboard?type=${type}&limit=${limit}`);
+  },
+
   // Badges
-  getAllBadges: () => api.get('/badges'),
-  getBadgeById: (badgeId) => api.get(`/badges/${badgeId}`),
-  
+  getBadges: () => {
+    console.log('🎖️ Fetching badges...');
+    return api.get('/badges');
+  },
+
   // Users
-  getCurrentUser: () => api.get('/users/me'),
-  updateProfile: (userData) => api.put('/users/me', userData),
-  getUserBadges: () => api.get('/users/me/badges'),
-  getUserAchievements: () => api.get('/users/me/achievements'),
-  
+  getCurrentUser: () => {
+    console.log('👤 Fetching current user...');
+    return api.get('/users/me');
+  },
+
   // Analytics
-  getAnalytics: () => api.get('/analytics/me'),
-  getProgress: () => api.get('/analytics/me/progress'),
-  
-  // AI
-  chatWithAI: (message, context) => api.post('/ai/chat', { message, context }),
-  reviewCode: (code, language) => api.post('/ai/code-review', { code, language }),
+  getAnalytics: () => {
+    console.log('📊 Fetching analytics...');
+    return api.get('/analytics/me');
+  },
 };
 
 export default api;
