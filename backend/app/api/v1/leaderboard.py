@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.services.leaderboard_service import LeaderboardService
 
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 async def get_leaderboard(
     type: str = Query("all_time", description="weekly, monthly, or all_time"),
     limit: int = Query(50, description="Number of results"),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get leaderboard"""
     try:
@@ -23,7 +23,7 @@ async def get_leaderboard(
 async def get_user_rank(
     user_id: str,
     type: str = Query("all_time"),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get specific user's rank"""
     try:

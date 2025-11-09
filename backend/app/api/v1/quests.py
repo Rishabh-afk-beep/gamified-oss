@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.services.quest_service import QuestService
 from typing import List
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/quests", tags=["quests"])
 async def get_quests(
     skip: int = 0,
     limit: int = 50,
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get all published quests"""
     try:
@@ -21,7 +21,7 @@ async def get_quests(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{quest_id}")
-async def get_quest(quest_id: str, db: AsyncDatabase = Depends(get_db)):
+async def get_quest(quest_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Get quest by ID"""
     try:
         service = QuestService(db)
@@ -34,7 +34,7 @@ async def get_quest(quest_id: str, db: AsyncDatabase = Depends(get_db)):
 async def start_quest(
     quest_id: str,
     user_id: str,  # Should come from auth token in production
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Start a quest"""
     try:

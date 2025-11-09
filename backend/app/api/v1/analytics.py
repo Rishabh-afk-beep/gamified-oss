@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 @router.get("/me")
 async def get_user_analytics(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get user analytics"""
     if not authorization:
@@ -32,7 +32,7 @@ async def get_user_analytics(
 @router.get("/me/progress")
 async def get_user_progress(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get user progress over time"""
     if not authorization:

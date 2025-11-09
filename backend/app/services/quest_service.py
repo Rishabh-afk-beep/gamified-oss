@@ -1,9 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime
 from bson import ObjectId
+from app.utils.json_encoder import convert_objectid
 
 class QuestService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.quests_collection = db["quests"]
         self.user_quests_collection = db["user_quests"]
@@ -22,7 +23,7 @@ class QuestService:
         }
         result = await self.quests_collection.insert_one(quest)
         quest["_id"] = result.inserted_id
-        return quest
+        return convert_objectid(quest)
 
     async def get_all_quests(self, limit: int = 50, skip: int = 0) -> list:
         """Get all published quests"""
@@ -31,18 +32,17 @@ class QuestService:
             "is_archived": False
         }).skip(skip).limit(limit).to_list(limit)
         
-        return [self._format_quest(q) for q in quests]
+        return [convert_objectid(q) for q in quests]
 
     async def get_quest_by_id(self, quest_id: str) -> dict:
         """Get quest by ID"""
         quest = await self.quests_collection.find_one({"_id": ObjectId(quest_id)})
         if not quest:
             raise ValueError("Quest not found")
-        return self._format_quest(quest)
+        return convert_objectid(quest)
 
     async def start_quest(self, user_id: str, quest_id: str) -> dict:
         """User starts a quest"""
-        
         user_quest = {
             "user_id": user_id,
             "quest_id": quest_id,
@@ -89,14 +89,4 @@ class QuestService:
         task = await self.tasks_collection.find_one({"_id": ObjectId(task_id)})
         if not task:
             raise ValueError("Task not found")
-        return self._format_task(task)
-
-    def _format_quest(self, quest: dict) -> dict:
-        """Format quest response"""
-        quest["id"] = str(quest.get("_id"))
-        return quest
-
-    def _format_task(self, task: dict) -> dict:
-        """Format task response"""
-        task["id"] = str(task.get("_id"))
-        return task
+        return convert_objectid(task)

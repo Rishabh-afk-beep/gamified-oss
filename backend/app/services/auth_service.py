@@ -1,10 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.schemas.user import UserCreate, UserLogin
 from datetime import timedelta
 
 class AuthService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
 

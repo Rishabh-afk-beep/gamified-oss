@@ -1,52 +1,56 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../utils/constants';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// Add token to requests if it exists
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect
-      localStorage.removeItem('access_token');
-      window.location.href = '/';
-    }
-    
-    if (error.response?.status === 403) {
-      console.error('Forbidden - insufficient permissions');
-    }
-    
-    if (error.response?.status === 404) {
-      console.error('Resource not found');
-    }
-    
-    if (error.response?.status >= 500) {
-      console.error('Server error - please try again later');
-    }
-    
-    return Promise.reject(error);
-  }
-);
+export const apiService = {
+  // Auth
+  register: (userData) => api.post('/auth/register', userData),
+  login: (credentials) => api.post('/auth/login', credentials),
+  
+  // Quests
+  getQuests: (limit = 50, skip = 0) => api.get(`/quests?limit=${limit}&skip=${skip}`),
+  getQuestById: (questId) => api.get(`/quests/${questId}`),
+  startQuest: (questId, userId) => api.post(`/quests/${questId}/start`, { user_id: userId }),
+  
+  // Leaderboard
+  getLeaderboard: (type = 'all_time', limit = 100) => 
+    api.get(`/leaderboard?type=${type}&limit=${limit}`),
+  getUserRank: (userId, type = 'all_time') => 
+    api.get(`/leaderboard/user/${userId}?type=${type}`),
+  
+  // Badges
+  getAllBadges: () => api.get('/badges'),
+  getBadgeById: (badgeId) => api.get(`/badges/${badgeId}`),
+  
+  // Users
+  getCurrentUser: () => api.get('/users/me'),
+  updateProfile: (userData) => api.put('/users/me', userData),
+  getUserBadges: () => api.get('/users/me/badges'),
+  getUserAchievements: () => api.get('/users/me/achievements'),
+  
+  // Analytics
+  getAnalytics: () => api.get('/analytics/me'),
+  getProgress: () => api.get('/analytics/me/progress'),
+  
+  // AI
+  chatWithAI: (message, context) => api.post('/ai/chat', { message, context }),
+  reviewCode: (code, language) => api.post('/ai/code-review', { code, language }),
+};
 
 export default api;

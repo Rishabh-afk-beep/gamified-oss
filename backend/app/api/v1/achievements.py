@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Header
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 
 from app.core.database import get_db
@@ -10,7 +10,7 @@ from bson import ObjectId
 router = APIRouter(prefix="/achievements", tags=["achievements"])
 
 @router.get("")
-async def get_all_achievements(db: AsyncDatabase = Depends(get_db)):
+async def get_all_achievements(db: AsyncIOMotorDatabase = Depends(get_db)):
     """Get all achievements"""
     try:
         achievements = await db["achievements"].find({}).to_list(None)
@@ -21,7 +21,7 @@ async def get_all_achievements(db: AsyncDatabase = Depends(get_db)):
 @router.get("/user/me")
 async def get_my_achievements(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user's achievements"""
     if not authorization:
@@ -45,7 +45,7 @@ async def get_my_achievements(
 @router.get("/{achievement_id}")
 async def get_achievement(
     achievement_id: str,
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get achievement details"""
     try:

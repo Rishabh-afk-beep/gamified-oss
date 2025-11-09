@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -12,7 +12,7 @@ async def submit_task(
     task_id: str,
     submission_data: dict,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Submit task solution"""
     if not authorization:
@@ -32,7 +32,7 @@ async def submit_task(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{task_id}")
-async def get_task(task_id: str, db: AsyncDatabase = Depends(get_db)):
+async def get_task(task_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Get task details"""
     try:
         service = QuestService(db)

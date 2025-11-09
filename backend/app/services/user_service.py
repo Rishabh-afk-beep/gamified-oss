@@ -1,9 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime
+from app.utils.json_encoder import convert_objectid
 
 class UserService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
         self.badges_collection = db["badges"]
@@ -15,7 +16,7 @@ class UserService:
             user = await self.users_collection.find_one({"_id": ObjectId(user_id)})
             if not user:
                 raise ValueError("User not found")
-            return user
+            return convert_objectid(user)
         except Exception as e:
             raise ValueError(f"Error fetching user: {str(e)}")
 
@@ -28,7 +29,7 @@ class UserService:
                 {"$set": update_data}
             )
             user = await self.users_collection.find_one({"_id": ObjectId(user_id)})
-            return user
+            return convert_objectid(user)
         except Exception as e:
             raise ValueError(f"Error updating user: {str(e)}")
 
@@ -49,7 +50,7 @@ class UserService:
                         "id": str(badge["_id"]),
                         "name": badge["name"],
                         "icon": badge["icon"],
-                        "earned_at": ub["earned_at"]
+                        "earned_at": ub["earned_at"].isoformat() if isinstance(ub["earned_at"], datetime) else ub["earned_at"]
                     })
             
             return badges
@@ -59,14 +60,13 @@ class UserService:
     async def get_user_achievements(self, user_id: str) -> list:
         """Get user's achievements"""
         try:
-            # Placeholder implementation
             achievements = [
                 {
                     "id": "1",
                     "title": "First Steps",
                     "description": "Complete your first quest",
                     "xp": 50,
-                    "date": datetime.utcnow(),
+                    "date": datetime.utcnow().isoformat(),
                     "type": "quest"
                 }
             ]
@@ -80,7 +80,6 @@ class UserService:
             user = await self.users_collection.find_one({"_id": ObjectId(user_id)})
             new_xp = user.get("total_xp", 0) + xp
             
-            # Update user
             await self.users_collection.update_one(
                 {"_id": ObjectId(user_id)},
                 {"$set": {

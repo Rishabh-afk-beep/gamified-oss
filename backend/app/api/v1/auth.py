@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from app.schemas.user import UserCreate, UserLogin, UserResponse
@@ -9,7 +9,7 @@ from app.services.auth_service import AuthService
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserResponse)
-async def register(user_data: UserCreate, db: AsyncDatabase = Depends(get_db)):
+async def register(user_data: UserCreate, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Register new user"""
     try:
         service = AuthService(db)
@@ -29,7 +29,7 @@ async def register(user_data: UserCreate, db: AsyncDatabase = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/login", response_model=Token)
-async def login(credentials: UserLogin, db: AsyncDatabase = Depends(get_db)):
+async def login(credentials: UserLogin, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Login user"""
     try:
         service = AuthService(db)
@@ -41,7 +41,7 @@ async def login(credentials: UserLogin, db: AsyncDatabase = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     token: str = None,
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user info"""
     if not token:

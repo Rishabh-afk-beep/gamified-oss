@@ -1,11 +1,11 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime
 import requests
 from app.core.config import settings
 
 class GitHubService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
         self.github_contributions_collection = db["github_contributions"]

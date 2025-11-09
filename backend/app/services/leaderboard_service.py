@@ -1,8 +1,9 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
+from app.utils.json_encoder import convert_objectid
 
 class LeaderboardService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
 
@@ -15,15 +16,16 @@ class LeaderboardService:
             
             leaderboard = []
             for idx, user in enumerate(users):
-                leaderboard.append({
+                leaderboard.append(convert_objectid({
                     "rank": idx + 1,
-                    "id": str(user["_id"]),
+                    "_id": user["_id"],
                     "username": user["username"],
                     "level": user.get("level", 1),
                     "total_xp": user.get("total_xp", 0),
                     "current_streak": user.get("current_streak", 0),
                     "avatar_url": user.get("avatar_url"),
-                })
+                    "badges": user.get("badges", []),
+                }))
             
             return leaderboard
         except Exception as e:
@@ -36,7 +38,6 @@ class LeaderboardService:
             if not user:
                 raise ValueError("User not found")
             
-            # Count users with more XP
             rank = await self.users_collection.count_documents({
                 "total_xp": {"$gt": user.get("total_xp", 0)},
                 "is_active": True

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 async def chat_with_ai(
     chat_msg: ChatMessage,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Chat with AI assistant"""
     if not authorization:
@@ -45,7 +45,7 @@ async def chat_with_ai(
 async def review_code(
     review_req: CodeReviewRequest,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get AI code review"""
     if not authorization:
@@ -72,7 +72,7 @@ async def review_code(
 async def get_hint(
     task_id: str,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get hint for task"""
     if not authorization:
@@ -93,7 +93,7 @@ async def get_hint(
 async def explain_concept(
     explanation_req: dict,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Explain a coding concept"""
     if not authorization:

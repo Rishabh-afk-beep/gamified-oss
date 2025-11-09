@@ -1,10 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime
 from app.utils import calculate_xp, calculate_level
 
 class GamificationService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
         self.badges_collection = db["badges"]

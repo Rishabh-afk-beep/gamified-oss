@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.database import db_client
 from app.api.v1 import router as api_router
-from app.middleware.error_handler import error_handler_middleware
+from app.utils.json_encoder import MongoJSONEncoder
+import json
 
 # Lifespan context manager
 @asynccontextmanager
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
     print(f"🌐 Environment: {'DEBUG' if settings.DEBUG else 'PRODUCTION'}")
     
     await db_client.connect()
+    print("✅ Connected to MongoDB")
     print("✅ Application started successfully!")
     print("📖 API Docs: http://localhost:8000/docs")
     print("🔗 ReDoc: http://localhost:8000/redoc")
@@ -23,7 +25,7 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    print("🛑 Shutting down application...")
+    print("\n🛑 Shutting down application...")
     await db_client.disconnect()
     print("✅ Application shut down successfully!")
 
@@ -37,6 +39,9 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
 )
+
+# Set custom JSON encoder
+app.json_encoder = MongoJSONEncoder
 
 # Add CORS middleware
 app.add_middleware(
@@ -74,15 +79,6 @@ async def root():
             "health": "/health",
             "api": "/api/v1"
         }
-    }
-
-# Error handling
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    """Global exception handler"""
-    return {
-        "detail": "Internal server error",
-        "error": str(exc)
     }
 
 if __name__ == "__main__":

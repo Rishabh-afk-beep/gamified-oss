@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from app.schemas.user import UserResponse, UserUpdate
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user info"""
     if not authorization:
@@ -46,7 +46,7 @@ async def get_current_user(
 async def update_user(
     user_update: UserUpdate,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Update user profile"""
     if not authorization:
@@ -79,7 +79,7 @@ async def update_user(
 @router.get("/me/badges")
 async def get_user_badges(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get user's earned badges"""
     if not authorization:
@@ -101,7 +101,7 @@ async def get_user_badges(
 @router.get("/me/achievements")
 async def get_user_achievements(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get user's achievements"""
     if not authorization:

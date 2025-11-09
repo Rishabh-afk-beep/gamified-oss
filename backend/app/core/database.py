@@ -1,15 +1,15 @@
-from motor.motor_asyncio import AsyncClient, AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.core.config import settings
 
 class DatabaseClient:
     def __init__(self):
-        self.client: AsyncClient = None
-        self.db: AsyncDatabase = None
+        self.client: AsyncIOMotorClient = None
+        self.db: AsyncIOMotorDatabase = None
 
     async def connect(self):
         """Connect to MongoDB"""
         try:
-            self.client = AsyncClient(settings.MONGODB_URL)
+            self.client = AsyncIOMotorClient(settings.MONGODB_URL)
             self.db = self.client[settings.DATABASE_NAME]
             # Test connection
             await self.db.command("ping")
@@ -24,12 +24,12 @@ class DatabaseClient:
             self.client.close()
             print("❌ Disconnected from MongoDB")
 
-    async def get_database(self) -> AsyncDatabase:
+    async def get_database(self) -> AsyncIOMotorDatabase:
         """Get database instance"""
         return self.db
 
 db_client = DatabaseClient()
 
-async def get_db() -> AsyncDatabase:
+async def get_db() -> AsyncIOMotorDatabase:
     """Dependency for getting database"""
     return db_client.db

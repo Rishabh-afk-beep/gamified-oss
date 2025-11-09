@@ -1,10 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime
 import os
 
 class AIService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.chat_history_collection = db["chat_history"]
         self.code_reviews_collection = db["code_reviews"]

@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -32,7 +32,7 @@ async def get_optional_user_id(
 
 async def verify_admin(
     user_id: str = Depends(get_current_user_id),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ) -> str:
     """Verify user is admin"""
     from bson import ObjectId

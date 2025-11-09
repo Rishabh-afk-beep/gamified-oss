@@ -1,9 +1,10 @@
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime, timedelta
+from app.utils.json_encoder import convert_objectid
 
 class AnalyticsService:
-    def __init__(self, db: AsyncDatabase):
+    def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.users_collection = db["users"]
         self.user_quests_collection = db["user_quests"]
@@ -14,13 +15,11 @@ class AnalyticsService:
         try:
             user = await self.users_collection.find_one({"_id": ObjectId(user_id)})
             
-            # Count quests
             quests_completed = await self.user_quests_collection.count_documents({
                 "user_id": user_id,
                 "status": "completed"
             })
             
-            # Count tasks
             tasks_completed = await self.submissions_collection.count_documents({
                 "user_id": user_id,
                 "status": "passed"
@@ -33,7 +32,7 @@ class AnalyticsService:
                 "level": user.get("level", 1),
                 "current_streak": user.get("current_streak", 0),
                 "longest_streak": user.get("longest_streak", 0),
-                "avg_time": "2.5h",  # Placeholder
+                "avg_time": "2.5h",
                 "streak_days": user.get("current_streak", 0)
             }
         except Exception as e:
@@ -42,7 +41,6 @@ class AnalyticsService:
     async def get_progress_data(self, user_id: str) -> list:
         """Get progress data over time"""
         try:
-            # Generate sample data
             progress_data = []
             for i in range(30):
                 date = datetime.utcnow() - timedelta(days=30-i)

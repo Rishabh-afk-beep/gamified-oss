@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 @router.get("")
 async def get_notifications(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db),
+    db: AsyncIOMotorDatabase = Depends(get_db),
     unread_only: bool = False,
     limit: int = 50
 ):
@@ -42,7 +42,7 @@ async def get_notifications(
 async def mark_as_read(
     notification_id: str,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Mark notification as read"""
     if not authorization:
@@ -70,7 +70,7 @@ async def mark_as_read(
 @router.post("/mark-all-read")
 async def mark_all_as_read(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Mark all notifications as read"""
     if not authorization:

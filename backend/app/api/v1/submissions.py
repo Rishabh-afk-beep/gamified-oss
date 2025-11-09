@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Header
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.core.security import verify_token
 from typing import Optional
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 async def create_submission(
     submission_data: SubmissionCreate,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Create code submission"""
     if not authorization:
@@ -45,7 +45,7 @@ async def create_submission(
 async def get_submission(
     submission_id: str,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get submission details"""
     if not authorization:
@@ -68,7 +68,7 @@ async def get_submission(
 async def evaluate_submission(
     submission_id: str,
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Evaluate submission"""
     if not authorization:
@@ -90,7 +90,7 @@ async def evaluate_submission(
 @router.get("/user/me")
 async def get_my_submissions(
     authorization: Optional[str] = Header(None),
-    db: AsyncDatabase = Depends(get_db),
+    db: AsyncIOMotorDatabase = Depends(get_db),
     limit: int = 50
 ):
     """Get current user's submissions"""
