@@ -1,34 +1,40 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Navbar from './components/common/Navbar';
+import Sidebar from './components/common/Sidebar';
+
+
 import { useAuth } from './hooks/useAuth';
 
 const AppLayout = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Don't show navbar on home page (or show it only for authenticated users)
+  // Example: optionally hide Navbar on home page
   const isHomePage = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar - Always show except maybe on home */}
-      <Navbar />
+    <div className="flex min-h-screen bg-gray-50">
       
-      {/* Main Content */}
-      <main>
-        <div className="container-custom py-8">
-          {/* Outlet renders the matched page */}
-          <Outlet />
-        </div>
-      </main>
+      {/* Sidebar */}
+      <Sidebar />
 
-      {/* Footer (optional) */}
-      <footer className="bg-gray-900 text-white py-8 mt-12">
-        <div className="container-custom text-center">
-          <p>&copy; 2024 CodeQuest. All rights reserved.</p>
-        </div>
-      </footer>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        
+        
+
+        {/* Page content */}
+        <main className="flex-1 p-8 overflow-y-auto">
+          <Outlet />
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-4 mt-auto">
+          <div className="container-custom text-center">
+            <p>&copy; 2024 CodeQuest. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };

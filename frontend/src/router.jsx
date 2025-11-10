@@ -17,6 +17,7 @@ import GitHubIntegration from "./pages/GitHubIntegration"; // ✅ Added this
 import GitHubTutorials from './pages/GitHubTutorials';
 import QuestMap from './pages/QuestMap';
 import GamificationStats from './pages/GamificationStats';
+import WorkflowDashboard from './pages/WorkflowDashboard';
 
 
 
@@ -52,6 +53,11 @@ export const router = createBrowserRouter([
             <Dashboard />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: '/workflow',
+        element: <ProtectedRoute><WorkflowDashboard /></ProtectedRoute>,
+
       },
       {
         path: '/quests',

@@ -6,6 +6,8 @@ from app.api.v1 import ai
 from app.api.v1 import github
 from app.api.v1 import tutorials
 from app.api.v1 import quests_system
+from app.api.v1 import workflow
+
 
 
 
@@ -66,6 +68,8 @@ app.include_router(ai.router)
 app.include_router(github.router)
 app.include_router(tutorials.router)
 app.include_router(quests_system.router)
+app.include_router(workflow.router)
+
 
 
 
