@@ -7,7 +7,9 @@ class User(BaseModel):
     id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     username: str
     email: str
-    password_hash: str
+    password_hash: Optional[str] = None  # Optional for Firebase users
+    firebase_uid: Optional[str] = None  # Firebase UID for Firebase auth
+    display_name: Optional[str] = None  # Display name from Firebase
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     github_id: Optional[str] = None

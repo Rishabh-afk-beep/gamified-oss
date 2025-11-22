@@ -1,45 +1,71 @@
-from fastapi import APIRouter, Depends, HTTPException
+"""
+Quest management routes
+"""
+from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.services.quest_service import QuestService
-from typing import List
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/quests", tags=["quests"])
 
+class CompleteQuestRequest(BaseModel):
+    quest_id: str
+    user_id: str = "demo_user"
+
+@router.get("/health")
+async def quests_health():
+    """Quests service health check"""
+    return {"status": "quests service active"}
+
 @router.get("")
-async def get_quests(
-    skip: int = 0,
-    limit: int = 50,
-    db: AsyncIOMotorDatabase = Depends(get_db)
-):
-    """Get all published quests"""
+async def get_quests():
+    """Get all available quests (in-memory version)"""
     try:
-        service = QuestService(db)
-        quests = await service.get_all_quests(limit=limit, skip=skip)
-        return quests
+        quest_service = QuestService()
+        quests = await quest_service.get_all_quests()
+        
+        print(f"📚 Returning {len(quests)} quests")
+        return quests  # Return list directly, not wrapped in dict
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Error in get_quests: {e}")
+        return {"error": str(e)}
 
-@router.get("/{quest_id}")
-async def get_quest(quest_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
-    """Get quest by ID"""
+@router.get("/")
+async def get_quests_slash():
+    """Get all available quests with trailing slash (in-memory version)"""
+    return await get_quests()
+
+@router.post("/complete")
+async def complete_quest(
+    request: CompleteQuestRequest
+):
+    """Complete a quest and update user analytics (in-memory version)"""
     try:
-        service = QuestService(db)
-        quest = await service.get_quest_by_id(quest_id)
-        return quest
-    except ValueError:
-        raise HTTPException(status_code=404, detail="Quest not found")
+        quest_service = QuestService()
+        result = await quest_service.complete_quest(request.user_id, request.quest_id)
+        print(f"🎯 Quest {request.quest_id} completed by {request.user_id}")
+        return {
+            "message": "Quest completed successfully!",
+            "data": result
+        }
+    except Exception as e:
+        print(f"❌ Error completing quest: {e}")
+        return {"error": str(e)}
 
-@router.post("/{quest_id}/start")
+@router.post("/start")
 async def start_quest(
-    quest_id: str,
-    user_id: str,  # Should come from auth token in production
-    db: AsyncIOMotorDatabase = Depends(get_db)
+    request: CompleteQuestRequest
 ):
-    """Start a quest"""
+    """Start a quest (in-memory version)"""
     try:
-        service = QuestService(db)
-        result = await service.start_quest(user_id, quest_id)
-        return result
+        quest_service = QuestService()
+        result = await quest_service.start_quest(request.user_id, request.quest_id)
+        print(f"▶️ Quest {request.quest_id} started by {request.user_id}")
+        return {
+            "message": "Quest started successfully!",
+            "data": result
+        }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Error starting quest: {e}")
+        return {"error": str(e)}

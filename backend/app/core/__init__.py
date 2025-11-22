@@ -1,20 +1,9 @@
 from app.core.config import settings
-from app.core.database import db_client, get_db
-from app.core.security import (
-    verify_password,
-    get_password_hash,
-    create_access_token,
-    decode_token,
-    verify_token,
-)
+from app.core.database import db_instance as db_client, get_db, get_database
 
 __all__ = [
     "settings",
-    "db_client",
+    "db_client", 
     "get_db",
-    "verify_password",
-    "get_password_hash",
-    "create_access_token",
-    "decode_token",
-    "verify_token",
+    "get_database",
 ]

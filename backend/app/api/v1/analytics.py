@@ -10,58 +10,21 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 @router.get("/me")
 async def get_user_analytics(
-    db: AsyncIOMotorDatabase = Depends(get_db),
     user_id: str = "demo_user"
 ):
-    """Get user analytics dashboard data"""
+    """Get user analytics dashboard data (in-memory version)"""
     try:
-        # Get user from database
-        user = await db["users"].find_one({"username": user_id})
+        # Use analytics service without database for now
+        from app.services.analytics_service import AnalyticsService
+        analytics_service = AnalyticsService()
         
-        if not user:
-            # Return default if user not found
-            return {
-                "username": "Unknown",
-                "total_quests": 0,
-                "total_xp": 0,
-                "level": 1,
-                "current_streak": 0,
-                "longest_streak": 0,
-                "badges_earned": 0,
-                "member_since": None,
-                "progress": {
-                    "current_level": 1,
-                    "progress_percentage": 0,
-                    "needed_xp": 1000
-                }
-            }
+        analytics_data = await analytics_service.get_user_analytics(user_id)
+        print(f"📊 Analytics for {user_id}: {analytics_data['total_xp']} XP, Level {analytics_data['level']}")
         
-        # Calculate level and progress
-        total_xp = user.get("total_xp", 0)
-        current_level = get_level_from_xp(total_xp)
-        progress = get_xp_progress(total_xp)
+        return analytics_data
         
-        return {
-            "username": user.get("username"),
-            "total_quests": user.get("quests_completed", 0),
-            "total_xp": total_xp,
-            "level": current_level,
-            "current_streak": user.get("current_streak", 0),
-            "longest_streak": user.get("longest_streak", 0),
-            "badges_earned": len(user.get("badges", [])),
-            "member_since": user.get("created_at").isoformat() if user.get("created_at") else None,
-            "progress": {
-                "current_level": progress["current_level"],
-                "current_xp": progress["current_xp"],
-                "level_start_xp": progress["level_start_xp"],
-                "level_end_xp": progress["level_end_xp"],
-                "progress_xp": progress["progress_xp"],
-                "needed_xp": progress["needed_xp"],
-                "progress_percentage": progress["progress_percentage"]
-            }
-        }
     except Exception as e:
-        print(f"Error in analytics: {e}")
+        print(f"❌ Error in analytics: {e}")
         return {"error": str(e)}
 
 

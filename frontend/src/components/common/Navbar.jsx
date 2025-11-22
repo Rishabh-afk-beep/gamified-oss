@@ -23,7 +23,6 @@ const Navbar = () => {
   const navLinks = [
     { path: '/dashboard', label: 'Dashboard', authenticated: true },
     { path: '/quests', label: 'Quests', authenticated: true },
-    { path: '/quest-map', label: '🗺️ Quest Map', authenticated: true },
     { path: '/leaderboard', label: 'Leaderboard', authenticated: true },
     { path: '/ai-chat', label: '🤖 AI Chat', authenticated: true },
     { path: '/gamification-stats', label: '🎮 Stats', authenticated: true },
@@ -125,7 +124,7 @@ const Navbar = () => {
                   onClick={() => {
                     handleLogout();
                     setIsOpen(false);
-                  }}.env
+                  }}
                   className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <FaSignOutAlt className="inline mr-2" /> Logout

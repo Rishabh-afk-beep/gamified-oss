@@ -39,14 +39,11 @@ const Chatbot = ({ questContext = null, taskId = null }) => {
     setIsLoading(true);
 
     try {
-      const response = await aiService.sendMessage(input, {
-        questContext,
-        taskId,
-        previousMessages: messages,
-      });
+      const response = await aiService.sendMessage(input, questContext || taskId);
+      
       const aiMessage = { 
         role: 'assistant', 
-        content: response.message || response,
+        content: response.success ? response.response : (response.error || 'Sorry, something went wrong.'),
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, aiMessage]);

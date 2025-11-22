@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import './QuestDetail.css';
+import { useAuth } from '../hooks/useAuth';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  PlayIcon,
+  ClockIcon,
+  StarIcon,
+  LightBulbIcon,
+  CodeBracketIcon,
+  BookOpenIcon,
+  AcademicCapIcon,
+  SparklesIcon,
+  FireIcon,
+  ArrowRightIcon
+} from '@heroicons/react/24/outline';
+import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 
 export default function QuestDetail() {
   const navigate = useNavigate();

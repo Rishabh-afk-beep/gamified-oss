@@ -46,28 +46,35 @@ class LearnRequest(BaseModel):
     concept: str
     level: str = "beginner"
 
+class CodeReviewRequest(BaseModel):
+    """Request for AI code review"""
+    code: str
+    language: str = "python"
+    quest_context: dict = None
+
+class QuestHintRequest(BaseModel):
+    """Request for quest-specific hint"""
+    quest_id: str
+    quest_context: dict
+    user_attempt: str = None
+
 # ==================== ENDPOINTS ====================
 
 @router.post("/chat")
 async def ai_chat(request: ChatRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
-
     """
     Chat with AI assistant using Google Gemini
-    
-    Parameters:
-    - message: Your question or message
-    - context: Optional context about what you're working on
-    - user_id: Your user ID (default: demo_user)
-    
-    Example:
-    {
-        "message": "How do I use loops in Python?",
-        "context": "I'm learning Python basics",
-        "user_id": "demo_user"
-    }
     """
     try:
-        print(f"🤖 Processing chat request from {request.user_id}")
+        print(f"🤖 Processing chat request from {request.user_id}: {request.message[:50]}...")
+        
+        # Validate request
+        if not request.message or not request.message.strip():
+            return {
+                "success": False,
+                "response": "Please provide a message to chat with the AI.",
+                "error": "Empty message"
+            }
         
         # Get AI response
         result = await ai_service.chat(
@@ -76,27 +83,58 @@ async def ai_chat(request: ChatRequest, db: AsyncIOMotorDatabase = Depends(get_d
             request.context
         )
         
-        # Save to database if successful
-        if result["success"]:
-            await db["ai_chats"].insert_one({
-                "user_id": request.user_id,
-                "message": request.message,
-                "response": result["response"],
-                "context": request.context,
-                "tokens_used": result["tokens_used"],
-                "model": result["model"],
-                "timestamp": datetime.utcnow()
-            })
-            print(f"✅ Chat saved to database")
+        # Ensure result has required fields
+        if not result:
+            return {
+                "success": False,
+                "response": "AI service returned no response. Please try again.",
+                "error": "Null result from AI service"
+            }
         
-        return result
+        # Check for successful response
+        if result.get("success") and result.get("response"):
+            # Save to database if successful
+            try:
+                await db["ai_chats"].insert_one({
+                    "user_id": request.user_id,
+                    "message": request.message,
+                    "response": result["response"],
+                    "context": request.context,
+                    "tokens_used": result.get("tokens_used", 0),
+                    "model": result.get("model", "unknown"),
+                    "timestamp": datetime.utcnow()
+                })
+                print(f"✅ Chat saved to database")
+            except Exception as db_error:
+                print(f"⚠️  Database save failed: {db_error}")
+                # Don't fail the request if database save fails
+            
+            return {
+                "success": True,
+                "response": result["response"],
+                "timestamp": result.get("timestamp"),
+                "tokens_used": result.get("tokens_used"),
+                "model": result.get("model")
+            }
+        else:
+            # AI service failed
+            error_message = result.get("error", "AI service failed")
+            ai_response = result.get("response", "I'm having trouble processing your request. Please try again.")
+            
+            return {
+                "success": False,
+                "response": ai_response,
+                "error": error_message
+            }
     
     except Exception as e:
-        print(f"❌ Error in chat endpoint: {str(e)}")
+        error_msg = str(e)
+        print(f"❌ Error in chat endpoint: {error_msg}")
+        
         return {
             "success": False,
-            "response": "Sorry, I encountered an error. Please try again.",
-            "error": str(e)
+            "response": "I'm experiencing technical difficulties. Please try again in a moment.",
+            "error": error_msg
         }
 
 
@@ -292,5 +330,97 @@ async def ai_health():
     except Exception as e:
         return {
             "status": "unhealthy",
+            "error": str(e)
+        }
+
+
+@router.post("/review-code")
+async def review_code(request: CodeReviewRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    AI code review for quest submissions
+    
+    Determines if code is correct and provides feedback
+    """
+    try:
+        print(f"🔍 AI Code Review requested for {request.language} code")
+        
+        if not request.code or not request.code.strip():
+            return {
+                "success": False,
+                "is_correct": False,
+                "feedback": "Please provide code to review.",
+                "suggestions": ["Write some code first!", "Make sure your code isn't empty"]
+            }
+        
+        # Get AI review
+        review_result = await ai_service.review_code(
+            request.code,
+            request.language,
+            request.quest_context
+        )
+        
+        if review_result["success"]:
+            # Save review to database
+            try:
+                await db["code_reviews"].insert_one({
+                    "code": request.code,
+                    "language": request.language,
+                    "quest_context": request.quest_context,
+                    "is_correct": review_result["is_correct"],
+                    "score": review_result.get("score", 0),
+                    "feedback": review_result["feedback"],
+                    "suggestions": review_result["suggestions"],
+                    "timestamp": datetime.utcnow()
+                })
+                print(f"✅ Code review saved to database")
+            except Exception as db_error:
+                print(f"⚠️  Database save failed: {db_error}")
+        
+        return review_result
+        
+    except Exception as e:
+        print(f"❌ Error in code review endpoint: {str(e)}")
+        return {
+            "success": False,
+            "is_correct": False,
+            "feedback": "Code review service encountered an error. Please try again.",
+            "suggestions": ["Try submitting again", "Check if your code is valid"],
+            "error": str(e)
+        }
+
+
+@router.post("/quest-hint")
+async def get_quest_hint(request: QuestHintRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Get AI-generated hint for a specific quest
+    """
+    try:
+        print(f"💡 Quest hint requested for: {request.quest_context.get('title', 'Unknown quest')}")
+        
+        hint_result = await ai_service.get_hint_for_quest(
+            request.quest_context,
+            request.user_attempt
+        )
+        
+        if hint_result["success"]:
+            # Save hint request to database
+            try:
+                await db["quest_hints"].insert_one({
+                    "quest_id": request.quest_id,
+                    "quest_context": request.quest_context,
+                    "user_attempt": request.user_attempt,
+                    "hint": hint_result["hint"],
+                    "timestamp": datetime.utcnow()
+                })
+            except Exception as db_error:
+                print(f"⚠️  Hint save failed: {db_error}")
+        
+        return hint_result
+        
+    except Exception as e:
+        print(f"❌ Error in quest hint endpoint: {str(e)}")
+        return {
+            "success": False,
+            "hint": "I'm having trouble generating a hint right now. Keep trying! 💪",
             "error": str(e)
         }

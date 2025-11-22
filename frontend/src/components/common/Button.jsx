@@ -34,7 +34,14 @@ const Button = ({
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={(e) => {
+        console.log('🔘 Button clicked:', children);
+        if (onClick) {
+          onClick(e);
+        } else {
+          console.log('⚠️ No onClick handler provided');
+        }
+      }}
       disabled={disabled || loading}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${width} ${className}`}
     >
