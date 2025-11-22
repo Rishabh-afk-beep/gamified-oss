@@ -10,7 +10,7 @@ def setup_environment():
     """Setup the working environment"""
     
     # Update API key in .env.local
-    working_key = "AIzaSyB9glcjyAZVz9plKqAB6gMKTuNAgJ1t8Fg"
+    working_key = "your_gemini_api_key_here"
     env_local = ".env.local"
     
     print("🔧 Setting up environment...")

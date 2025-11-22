@@ -8,7 +8,7 @@ env_files = [".env.local", ".env", ".env.example"]
 api_key = None
 
 # First, try to use the new API key directly for testing
-test_api_key = "AIzaSyB9glcjyAZVz9plKqAB6gMKTuNAgJ1t8Fg"
+test_api_key = "your_gemini_api_key_here"
 
 for env_file in env_files:
     if os.path.exists(env_file):

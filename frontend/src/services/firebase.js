@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDXciSdRuGeqE4MWsSOBPPwKA2ugtQuSwA",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "gamified-oss.firebaseapp.com", 
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "gamified-oss",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "gamified-oss.firebasestorage.app",

@@ -6,7 +6,7 @@ import os
 import google.generativeai as genai
 
 # Your new API key
-NEW_API_KEY = "AIzaSyB9glcjyAZVz9plKqAB6gMKTuNAgJ1t8Fg"
+NEW_API_KEY = "your_new_gemini_api_key_here"
 
 def test_new_api_key():
     """Test if the new API key works"""

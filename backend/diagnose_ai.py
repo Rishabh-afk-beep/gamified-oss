@@ -141,7 +141,7 @@ async def diagnose():
 if __name__ == "__main__":
     # Update .env.local with working API key
     env_local = ".env.local"
-    working_key = "AIzaSyD6C_GYuGvgm8phAi37DKg_FXGxlaRCjKA"
+    working_key = "your_gemini_api_key_here"
     
     print("🔧 Updating .env.local with working API key...")
     
