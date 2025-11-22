@@ -12,7 +12,7 @@
 [![AI](https://img.shields.io/badge/AI-Google_Gemini-4285F4?logo=google)](https://ai.google.dev/)
 [![Database](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb)](https://mongodb.com)
 
-[🚀 Live Demo](https://codequest.example.com) • [📖 Documentation](https://github.com/rishav-026/Gamified-Coding_platform/wiki) • [🎯 Features](#-features) • [⚡ Quick Start](#-quick-start)
+[🚀 Live Demo](https://codequest.example.com) • [📖 Documentation](https://github.com/Rishabh-afk-beep/gamified-oss/wiki) • [🎯 Features](#-features) • [⚡ Quick Start](#-quick-start)
 
 </div>
 
@@ -81,8 +81,8 @@ CodeQuest is a **revolutionary gamified platform** that transforms learning to c
 
 ```bash
 # 1️⃣ Clone the repository
-git clone https://github.com/rishav-026/Gamified-Coding_platform.git
-cd Gamified-Coding_platform
+git clone https://github.com/Rishabh-afk-beep/gamified-oss.git
+cd gamified-oss
 
 # 2️⃣ Backend setup
 cd backend
@@ -443,9 +443,9 @@ python -c "from motor.motor_asyncio import AsyncIOMotorClient; print('MongoDB OK
 
 ### 📞 **Getting Help**
 
-- 📖 **Documentation**: [Wiki](https://github.com/rishav-026/Gamified-Coding_platform/wiki)
-- 🐛 **Bug Reports**: [Issues](https://github.com/rishav-026/Gamified-Coding_platform/issues)
-- 💬 **Community**: [Discussions](https://github.com/rishav-026/Gamified-Coding_platform/discussions)
+- 📖 **Documentation**: [Wiki](https://github.com/Rishabh-afk-beep/gamified-oss/wiki)
+- 🐛 **Bug Reports**: [Issues](https://github.com/Rishabh-afk-beep/gamified-oss/issues)
+- 💬 **Community**: [Discussions](https://github.com/Rishabh-afk-beep/gamified-oss/discussions)
 - 📧 **Direct Contact**: rishav.developer@gmail.com
 
 ---
@@ -458,8 +458,8 @@ We welcome contributions from developers of all skill levels! 🎉
 
 ```bash
 # 1️⃣ Fork & Clone
-git clone https://github.com/YOUR_USERNAME/Gamified-Coding_platform.git
-cd Gamified-Coding_platform
+git clone https://github.com/YOUR_USERNAME/gamified-oss.git
+cd gamified-oss
 
 # 2️⃣ Create Feature Branch
 git checkout -b feature/amazing-new-feature
@@ -602,7 +602,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### 🌟 **Join the CodeQuest Community**
 
-- 🐙 **GitHub**: [rishav-026/Gamified-Coding_platform](https://github.com/rishav-026/Gamified-Coding_platform)
+- 🐙 **GitHub**: [Rishabh-afk-beep/gamified-oss](https://github.com/Rishabh-afk-beep/gamified-oss)
 - 💬 **Discord**: [Join our server](https://discord.gg/codequest)
 - 🐦 **Twitter**: [@CodeQuestDev](https://twitter.com/codequestdev)
 - 📧 **Email**: community@codequest.dev
@@ -613,7 +613,7 @@ Thanks to these amazing developers who make CodeQuest possible:
 
 <div align="center">
 
-[![Contributors](https://contrib.rocks/image?repo=rishav-026/Gamified-Coding_platform)](https://github.com/rishav-026/Gamified-Coding_platform/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=Rishabh-afk-beep/gamified-oss)](https://github.com/Rishabh-afk-beep/gamified-oss/graphs/contributors)
 
 </div>
 
@@ -656,11 +656,11 @@ CodeQuest was inspired by:
 
 ## 🚀 Ready to Start Your Coding Quest?
 
-**[🎮 Get Started Now](https://github.com/rishav-026/Gamified-Coding_platform#-quick-start)** • **[📖 Read the Docs](https://github.com/rishav-026/Gamified-Coding_platform/wiki)** • **[🤝 Join Community](https://discord.gg/codequest)**
+**[🎮 Get Started Now](https://github.com/Rishabh-afk-beep/gamified-oss#-quick-start)** • **[📖 Read the Docs](https://github.com/Rishabh-afk-beep/gamified-oss/wiki)** • **[🤝 Join Community](https://discord.gg/codequest)**
 
 ---
 
-### Made with ❤️ by [@rishav-026](https://github.com/rishav-026)
+### Made with ❤️ by [@Rishabh-afk-beep](https://github.com/Rishabh-afk-beep)
 
 **⭐ Star this repo if you found it helpful! ⭐**
 
